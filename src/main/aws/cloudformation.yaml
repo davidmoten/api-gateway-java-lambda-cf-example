@@ -125,7 +125,7 @@ Resources:
       - "ApiDeployment"
       - "Api"
     Properties: 
-      Name: "${application}-user"
+      Name: !Sub "${application}-user"
       Description: "CloudFormation API Key V1"
       Enabled: "true"
 
