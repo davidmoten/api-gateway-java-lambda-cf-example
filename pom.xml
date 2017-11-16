@@ -16,6 +16,8 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <application>${project.artifactId}</application>
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <timestampSuffix>-${timestamp}</timestampSuffix>
     </properties>
     <dependencies>
         <dependency>
@@ -64,7 +66,7 @@
                             <bucketName>${artifact.bucket}-${mode}</bucketName>
                             <create>true</create>
                             <file>${project.build.directory}/${project.artifactId}.jar</file>
-                            <objectName>${project.artifactId}-${project.version}.jar</objectName>
+                            <objectName>${project.artifactId}-${project.version}${timestampSuffix}.jar</objectName>
                             <!-- optional proxy config -->
                             <httpsProxyHost>${proxy.host}</httpsProxyHost>
                             <httpsProxyPort>${proxy.port}</httpsProxyPort>
@@ -83,7 +85,7 @@
                             <parameters>
                                 <mode>${mode}</mode>
                                 <artifactBucket>${artifact.bucket}-${mode}</artifactBucket>
-                                <artifactObjectName>${project.artifactId}-${project.version}.jar</artifactObjectName>
+                                <artifactObjectName>${project.artifactId}-${project.version}${timestampSuffix}.jar</artifactObjectName>
                                 <application>${application}</application>
                             </parameters>
                             <template>src/main/aws/cloudformation.yaml</template>
