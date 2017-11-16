@@ -33,9 +33,9 @@ The call to `deploy.sh` will do the following:
 
 ### How to call the api
 
-In the AWS Console go to **API Gateway - api-gateway-java-lambda-cf-example-&lt;MODE&gt; - Stages - &lt;MODE&gt;** and copy the url displayed there.
+In the AWS Console go to **API Gateway** - **api-gateway-java-lambda-cf-example-&lt;MODE&gt;** - **Stages** - **&lt;MODE&gt;** - **Invoke URL** and copy the url displayed there.
 
-Also in the AWS Console go to **API Gateway - API Keys - api-gateway-java-lambda-cf-user-&lt;MODE&gt; - API Key - Show** and copy it also.
+Also in the AWS Console go to **API Gateway** - **API Keys** - **api-gateway-java-lambda-cf-user-&lt;MODE&gt;** - **API Key** - **Show** and copy it also.
 
 ```bash
 URL= ...
