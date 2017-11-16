@@ -110,7 +110,7 @@ Resources:
       ApiStages:
       - ApiId: !Ref Api
         Stage: !Ref ApiStage 
-      Description: !Sub "${application} api usage plan"
+      Description: !Sub "${application}-${mode} api usage plan"
       Quota:
         Limit: 30000
         Period: MONTH
@@ -125,7 +125,7 @@ Resources:
       - "ApiDeployment"
       - "Api"
     Properties: 
-      Name: !Sub "${application}-user"
+      Name: !Sub "${application}-user-${mode}"
       Description: "CloudFormation created API Key"
       Enabled: "true"
 
