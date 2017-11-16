@@ -115,10 +115,22 @@ Resources:
         RateLimit: 1 # per second
       UsagePlanName: !Sub "${application}-usage-plan-${mode}" 
 
+  ApiKey: 
+    Type: "AWS::ApiGateway::ApiKey"
+    DependsOn: 
+      - "ApiDeployment"
+      - "Api"
+    Properties: 
+      Name: "${application}-user"
+      Description: "CloudFormation API Key V1"
+      Enabled: "true"
+
   ApiUsagePlanKeyExampleUser:
     Type: AWS::ApiGateway::UsagePlanKey
+    DependsOn: 
+      - "ApiKey"
     Properties : 
-      KeyId: "8vnhdy5s66"
+      KeyId: !Ref ApiKey
       KeyType: API_KEY
       UsagePlanId: !Ref ApiUsagePlan 
 
