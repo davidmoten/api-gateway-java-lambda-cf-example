@@ -14,4 +14,4 @@ else
   COMMAND='aws:deployFileS3@file' 
   PARAMS="$2 $3 $4 $5 $6 $7 $8"
 fi
-mvn clean package $COMMAND aws:deployCf@cf -Dmode=$MODE $PARAMS 
+mvn clean package $COMMAND aws:deployCf@cf aws:deployRestApi@api -Dmode=$MODE $PARAMS 

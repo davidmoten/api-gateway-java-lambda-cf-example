@@ -95,6 +95,21 @@
                             <httpsProxyPort>${proxy.port}</httpsProxyPort>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>api</id>
+                        <goals>
+                            <goal>deployRestApi</goal>
+                        </goals>
+                        <configuration>
+                            <serverId>amsa.aws</serverId>
+                            <region>ap-southeast-2</region>
+                            <restApiName>${application}-${mode}</restApiName>
+                            <stage>${mode}</stage>
+                            <!-- optional proxy config -->
+                            <httpsProxyHost>${proxy.host}</httpsProxyHost>
+                            <httpsProxyPort>${proxy.port}</httpsProxyPort>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
