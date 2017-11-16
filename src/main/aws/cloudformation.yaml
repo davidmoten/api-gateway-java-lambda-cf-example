@@ -126,7 +126,7 @@ Resources:
       - "Api"
     Properties: 
       Name: !Sub "${application}-user"
-      Description: "CloudFormation API Key V1"
+      Description: "CloudFormation created API Key"
       Enabled: "true"
 
   ApiUsagePlanKeyExampleUser:
@@ -154,7 +154,7 @@ Resources:
         schemes:
         - "https"
         paths:
-          /json:
+          /do:
             get:
               consumes:
               - "application/json"
