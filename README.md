@@ -47,5 +47,7 @@ prints out
 Hello fred
 ```
 
+You can also test the api in the AWS Console at **API Gateway** - **api-gateway-java-lambda-cf-example-&lt;MODE&gt;** - **Resources** - **/do** - **GET** - **Test** 
+
 
 
