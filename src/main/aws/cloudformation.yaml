@@ -95,9 +95,9 @@ Resources:
         - ResourcePath: !Sub "/${path}"
           HttpMethod: GET
           MetricsEnabled: 'true'
-          DataTraceEnabled: 'true'
+          #DataTraceEnabled: 'true'
           ThrottlingBurstLimit: '999'
-          LoggingLevel: INFO
+          #LoggingLevel: INFO
       RestApiId: 
         Ref: Api
       StageName: !Sub "${mode}"
