@@ -51,9 +51,9 @@ Resources:
       Handler: !Sub '${handler}'
       MemorySize: 512
       Timeout: 300 # seconds
-      #Role: !GetAtt 
-      #  - LambdaFunctionRole
-      #  - Arn
+      Role: !GetAtt 
+        - LambdaFunctionRole
+        - Arn
       Runtime: java8
       Environment:
         Variables:
