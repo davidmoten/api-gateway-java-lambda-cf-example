@@ -29,14 +29,14 @@ The call to `deploy.sh` will do the following:
 
 ### How to call the api
 
-In the AWS Console go to **API Gateway - api-gateway-java-lambda-cf-example-&lt;MODE&gt; - Stages - <MODE>** and copy the url displayed there.
+In the AWS Console go to **API Gateway - api-gateway-java-lambda-cf-example-&lt;MODE&gt; - Stages - &lt;MODE&gt;** and copy the url displayed there.
 
-Also in the AWS Console go to **API Gateway - API Keys - api-gateway-java-lambda-cf-user-<MODE> - API Key - Show** and copy it also.
+Also in the AWS Console go to **API Gateway - API Keys - api-gateway-java-lambda-cf-user-&lt;MODE&gt; - API Key - Show** and copy it also.
 
 ```bash
 URL= ...
 X_API_KEY= ...
-curl -H "x-api-key: $X_API_KEY" "$URL/&lt;MODE&gt;/do?name=fred"
+curl -H "x-api-key: $X_API_KEY" "$URL/<MODE>/do?name=fred"
 ```
 prints out 
 ```
