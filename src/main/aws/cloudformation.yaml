@@ -101,8 +101,6 @@ Resources:
       RestApiId: 
         Ref: Api
       StageName: !Sub "${mode}"
-      Variables:
-        function: !Sub "${application}-${mode}"
         
   ApiUsagePlan:
     Type: AWS::ApiGateway::UsagePlan
@@ -206,7 +204,7 @@ Resources:
                     \ \"$context.resourceId\",\n    \"resource-path\" : \"$context.resourcePath\"\
                     \n    }\n}\n"
                 # escape the substitution using ! before stageVariables.function
-                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${!stageVariables.function}/invocations"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${application}-${mode}/invocations"
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
