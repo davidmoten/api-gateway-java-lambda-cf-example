@@ -10,42 +10,50 @@ Parameters:
     MaxLength: 255
     
   artifactBucket:
-    Default: weather-download-artifacts
+    Default: artifacts
     Type: String
   
   artifactObjectName:
-    Default: weather-download-6.0-SNAPSHOT
+    Default: artifact-6.0-SNAPSHOT.jar
+    Type: String
+    
+  application:
+    Default: application
+    Type: String
+    
+  handler:
+    Default: com.github.davidmoten.apig.example.Handler.handle
     Type: String
 
 Resources:
 
-  LambdaFunctionApiGet:
+  LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
       Code:
         S3Bucket: !Sub '${artifactBucket}'
         S3Key: !Sub '${artifactObjectName}'
-      FunctionName: !Sub 'weather-api-get-${mode}'
-      Handler: 'au.gov.amsa.weather.api.Handler::get'
+      FunctionName: !Sub '${application}-${mode}'
+      Handler: !Sub '${handler}'
       MemorySize: 512
       Timeout: 300 # seconds
-      Role: !GetAtt 
-        - LambdaFunctionApiGetRole
-        - Arn
+      #Role: !GetAtt 
+      #  - LambdaFunctionRole
+      #  - Arn
       Runtime: java8
       Environment:
         Variables:
-          JSON_BUCKET: !Sub "${weatherJsonBucket}"
+          WHO: !Sub "${application}"
           
   ## give the /json api gateway resource permission to execute the lambda
   ApiGatewayInvokeApiGetLambdaPermission: 
     Type: "AWS::Lambda::Permission"
     DependsOn:
     - Api
-    - LambdaFunctionApiGet
+    - LambdaFunction
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !Ref LambdaFunctionApiGet
+      FunctionName: !Ref LambdaFunction
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/GET/encrypt"
       
@@ -76,7 +84,7 @@ Resources:
         Ref: Api
       StageName: !Sub "${mode}"
       Variables:
-        function: !Sub "weather-api-get-${mode}"
+        function: !Sub "${application}-${mode}"
         
   ApiUsagePlan:
     Type: AWS::ApiGateway::UsagePlan
@@ -84,16 +92,16 @@ Resources:
       ApiStages:
       - ApiId: !Ref Api
         Stage: !Ref ApiStage 
-      Description: "weather api usage plan"
+      Description: !Sub "${application} api usage plan"
       Quota:
         Limit: 30000
         Period: MONTH
       Throttle:
         BurstLimit: 3 # per second
         RateLimit: 1 # per second
-      UsagePlanName: !Sub "weather-api-usage-plan-${mode}" 
+      UsagePlanName: !Sub "${application}-usage-plan-${mode}" 
 
-  ApiUsagePlanKeyWindowsService:
+  ApiUsagePlanKeyExampleUser:
     Type: AWS::ApiGateway::UsagePlanKey
     Properties : 
       KeyId: "8vnhdy5s66"
@@ -103,15 +111,15 @@ Resources:
   Api:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: !Sub "weather-api-${mode}"
-      Description: !Sub "${mode} weather rest api"
+      Name: !Sub "${application}-${mode}"
+      Description: !Sub "${application} ${mode} rest api"
       FailOnWarnings: true
       Body:
         swagger: "2.0"
         info:
           version: "2017-03-30T22:50:37Z"
-          title: "weather api"
-        host: !Sub "weather.execute-api.ap-southeast-2.amazonaws.com"
+          title: "${application}"
+        host: !Sub "application.execute-api.ap-southeast-2.amazonaws.com"
         basePath: !Sub "/${mode}"
         schemes:
         - "https"
@@ -123,11 +131,7 @@ Resources:
               produces:
               - "text/plain"
               parameters:
-              - name: "stringToEncrypt"
-                in: "query"
-                required: true
-                type: "string"
-              - name: "publicKey"
+              - name: "name"
                 in: "query"
                 required: true
                 type: "string"

@@ -6,6 +6,17 @@
     <name>${project.artifactId}</name>
     <version>0.1-SNAPSHOT</version>
     <description>Example project to demonstrate integration of api gateway, java lambda deployed using cloudformation to multiple environments</description>
+    <properties>
+        <server.id>my.aws</server.id>
+        <region>ap-southeast-2</region>
+        <artifact.bucket>${project.artifactId}-artifacts</artifact.bucket>
+        <mode>dev</mode>
+        <proxy.host>proxy</proxy.host>
+        <proxy.port>8080</proxy.port>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <application>${project.artifactId}</application>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -28,12 +39,102 @@
             <artifactId>aws-lambda-java-log4j</artifactId>
             <version>1.0.0</version>
         </dependency>
-
         <dependency>
             <groupId>com.github.davidmoten</groupId>
             <artifactId>aws-helper</artifactId>
             <version>0.2.2</version>
         </dependency>
     </dependencies>
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>com.github.davidmoten</groupId>
+                <artifactId>aws-maven-plugin</artifactId>
+                <version>0.2.14</version>
+                <executions>
+                    <execution>
+                        <id>file</id>
+                        <goals>
+                            <goal>deployFileS3</goal>
+                        </goals>
+                        <configuration>
+                            <serverId>${server.id}</serverId>
+                            <region>${region}</region>
+                            <bucketName>${artifact.bucket}-${mode}</bucketName>
+                            <create>true</create>
+                            <file>${project.build.directory}/${project.artifactId}.jar</file>
+                            <objectName>${project.artifactId}-${project.version}.jar</objectName>
+                            <!-- optional proxy config -->
+                            <httpsProxyHost>${proxy.host}</httpsProxyHost>
+                            <httpsProxyPort>${proxy.port}</httpsProxyPort>
+                        </configuration>
+                    </execution>
+                    <!-- mvn aws:deployCf@cf -->
+                    <execution>
+                        <id>cf</id>
+                        <goals>
+                            <goal>deployCf</goal>
+                        </goals>
+                        <configuration>
+                            <serverId>${server.id}</serverId>
+                            <region>${region}</region>
+                            <stackName>lambda-${project.artifactId}-${mode}</stackName>
+                            <parameters>
+                                <mode>${mode}</mode>
+                                <artifactBucket>${artifact.bucket}-${mode}</artifactBucket>
+                                <artifactObjectName>${project.artifactId}-${project.version}.jar</artifactObjectName>
+                                <application>${application}</application>
+                            </parameters>
+                            <template>src/main/aws/cloudformation.yaml</template>
+                            <intervalSeconds>2</intervalSeconds>
+                            <!-- optional proxy config -->
+                            <httpsProxyHost>${proxy.host}</httpsProxyHost>
+                            <httpsProxyPort>${proxy.port}</httpsProxyPort>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <minimizeJar>true</minimizeJar>
+                            <filters>
+                                <filter>
+                                    <artifact>org.glassfish:javax.json</artifact>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </filter>
+                                <filter>
+                                    <artifact>log4j:log4j</artifact>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.fasterxml.jackson.*:*</artifact>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
 
