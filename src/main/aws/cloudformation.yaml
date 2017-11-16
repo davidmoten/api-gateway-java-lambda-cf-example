@@ -24,6 +24,10 @@ Parameters:
   handler:
     Default: com.github.davidmoten.apig.example.Handler.handle
     Type: String
+    
+  path: 
+    Default: do
+    Type: String
 
 Resources:
 
@@ -69,7 +73,7 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref LambdaFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/GET/encrypt"
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/GET/${path}"
       
   ## create the deployment of a stage (so that the stage is published to an https url)
   ApiDeployment:
@@ -88,7 +92,7 @@ Resources:
         Ref: ApiDeployment
       Description: !Sub "stage for ${mode}"
       MethodSettings:
-        - ResourcePath: "/json"
+        - ResourcePath: !Sub "/${path}"
           HttpMethod: GET
           MetricsEnabled: 'true'
           DataTraceEnabled: 'true'
