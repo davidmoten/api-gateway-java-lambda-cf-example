@@ -13,6 +13,7 @@ Example of integration of api gateway and java lambda using cloud-formation
 ```
 The call to `deploy.sh` will do the following:
 
+* build the project jar artifact
 * create a bucket for artifacts (for lambda) for the application if doesn't exist
 * deploy the built maven artifact versioned and timestamped to the artifact bucket
 * create a CloudFormation stack comprising
@@ -25,5 +26,22 @@ The call to `deploy.sh` will do the following:
   * one GET path that maps a String response from the lambda handler to `text/plain` content
   * permission for the api gateway to call the lambda (including the Test interface in the AWS Console)
 * deploy the stage (not performed automatically by a CloudFormation update)
- 
+
+### How to call the api
+
+In the AWS Console go to **API Gateway - api-gateway-java-lambda-cf-example-<MODE> - Stages - <MODE>** and copy the url displayed there.
+
+Also in the AWS Console go to **API Gateway - API Keys - api-gateway-java-lambda-cf-user-<MODE> - API Key - Show** and copy it also.
+
+```bash
+URL= ...
+X_API_KEY= ...
+curl -H "x-api-key: $X_API_KEY" "$URL/<MODE>/do?name=fred"
+```
+prints out 
+```
+Hello fred
+```
+
+
 
