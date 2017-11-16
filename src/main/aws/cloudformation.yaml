@@ -22,7 +22,7 @@ Parameters:
     Type: String
     
   handler:
-    Default: com.github.davidmoten.apig.example.Handler.handle
+    Default: com.github.davidmoten.apig.example.Handler::handle
     Type: String
     
   path: 

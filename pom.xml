@@ -81,7 +81,7 @@
                         <configuration>
                             <serverId>${server.id}</serverId>
                             <region>${region}</region>
-                            <stackName>lambda-${project.artifactId}-${mode}</stackName>
+                            <stackName>${project.artifactId}-${mode}</stackName>
                             <parameters>
                                 <mode>${mode}</mode>
                                 <artifactBucket>${artifact.bucket}-${mode}</artifactBucket>
