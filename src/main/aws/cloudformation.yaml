@@ -2,9 +2,9 @@ AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
 
-  mode:
+  stage:
     Default: dev
-    Description: modal environment to create
+    Description: api stage
     Type: String
     MinLength: 1
     MaxLength: 255
@@ -34,7 +34,7 @@ Resources:
   LambdaFunctionRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Sub '${application}-${mode}'
+      RoleName: !Sub '${application}'
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -51,7 +51,7 @@ Resources:
       Code:
         S3Bucket: !Sub '${artifactBucket}'
         S3Key: !Sub '${artifactObjectName}'
-      FunctionName: !Sub '${application}-${mode}'
+      FunctionName: !Sub '${application}'
       Handler: !Sub '${handler}'
       MemorySize: 512
       Timeout: 300 # seconds
@@ -80,10 +80,10 @@ Resources:
   ApiDeployment:
     Type: "AWS::ApiGateway::Deployment"
     Properties:
-      Description: !Sub "deployment of stage ${mode}"
+      Description: !Sub "deployment of stage ${stage}"
       RestApiId:
         Ref: Api
-      StageName: !Sub "${mode}Dummy" # must be different from stage name below (see https://blog.jayway.com/2016/08/17/introduction-to-cloudformation-for-api-gateway/)
+      StageName: !Sub "${stage}Dummy" # must be different from stage name below (see https://blog.jayway.com/2016/08/17/introduction-to-cloudformation-for-api-gateway/)
   
   ## create the stage
   ApiStage:
@@ -91,7 +91,7 @@ Resources:
     Properties:
       DeploymentId: 
         Ref: ApiDeployment
-      Description: !Sub "stage for ${mode}"
+      Description: !Sub "stage for ${stage}"
       MethodSettings:
         - ResourcePath: !Sub "/${path}"
           HttpMethod: GET
@@ -101,7 +101,7 @@ Resources:
           #LoggingLevel: INFO
       RestApiId: 
         Ref: Api
-      StageName: !Sub "${mode}"
+      StageName: !Sub "${stage}"
         
   ApiUsagePlan:
     Type: AWS::ApiGateway::UsagePlan
@@ -109,14 +109,14 @@ Resources:
       ApiStages:
       - ApiId: !Ref Api
         Stage: !Ref ApiStage 
-      Description: !Sub "${application}-${mode} api usage plan"
+      Description: !Sub "${application} api usage plan"
       Quota:
         Limit: 30000
         Period: MONTH
       Throttle:
         BurstLimit: 3 # per second
         RateLimit: 1 # per second
-      UsagePlanName: !Sub "${application}-usage-plan-${mode}" 
+      UsagePlanName: !Sub "${application}-usage-plan" 
 
   ApiKey: 
     Type: "AWS::ApiGateway::ApiKey"
@@ -124,7 +124,7 @@ Resources:
       - "ApiDeployment"
       - "Api"
     Properties: 
-      Name: !Sub "${application}-user-${mode}"
+      Name: !Sub "${application}-user"
       Description: "CloudFormation created API Key"
       Enabled: "true"
 
@@ -140,8 +140,8 @@ Resources:
   Api:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: !Sub "${application}-${mode}"
-      Description: !Sub "${application} ${mode} rest api"
+      Name: !Sub "${application}"
+      Description: !Sub "${application} rest api"
       FailOnWarnings: true
       Body:
         swagger: "2.0"
@@ -149,7 +149,7 @@ Resources:
           version: "2017-03-30T22:50:37Z"
           title: "${application}"
         host: !Sub "application.execute-api.ap-southeast-2.amazonaws.com"
-        basePath: !Sub "/${mode}"
+        basePath: !Sub "/${stage}"
         schemes:
         - "https"
         paths:
@@ -205,7 +205,7 @@ Resources:
                     \ \"$context.resourceId\",\n    \"resource-path\" : \"$context.resourcePath\"\
                     \n    }\n}\n"
                 # escape the substitution using ! before stageVariables.function
-                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${application}-${mode}/invocations"
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${application}/invocations"
                 passthroughBehavior: "when_no_match"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"

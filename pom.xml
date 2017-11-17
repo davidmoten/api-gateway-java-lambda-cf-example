@@ -11,7 +11,6 @@
         <region>ap-southeast-2</region>
         <application>myapp</application>
         <artifact.bucket>${application}-artifacts</artifact.bucket>
-        <mode>dev</mode>
         <proxy.host></proxy.host>
         <!-- as long as proxy.host is blank this property won't be used -->
         <proxy.port>8080</proxy.port>
@@ -44,7 +43,7 @@
             <plugin>
                 <groupId>com.github.davidmoten</groupId>
                 <artifactId>aws-maven-plugin</artifactId>
-                <version>0.2.15-SNAPSHOT</version>
+                <version>0.2.16</version>
                 <executions>
                     <execution>
                         <id>prop</id>
@@ -67,7 +66,7 @@
                         <configuration>
                             <serverId>${server.id}</serverId>
                             <region>${region}</region>
-                            <bucketName>${artifact.bucket}-${aws.account.id}-${mode}</bucketName>
+                            <bucketName>${artifact.bucket}-${aws.account.id}</bucketName>
                             <create>true</create>
                             <file>${project.build.directory}/${project.artifactId}.jar</file>
                             <objectName>${project.artifactId}-${project.version}${timestampSuffix}.jar</objectName>
@@ -85,11 +84,11 @@
                         <configuration>
                             <serverId>${server.id}</serverId>
                             <region>${region}</region>
-                            <stackName>${application}-${mode}</stackName>
+                            <stackName>${application}</stackName>
                             <parameters>
-                                <mode>${mode}</mode>
-                                <artifactBucket>${artifact.bucket}-${aws.account.id}-${mode}</artifactBucket>
+                                <artifactBucket>${artifact.bucket}-${aws.account.id}</artifactBucket>
                                 <artifactObjectName>${project.artifactId}-${project.version}${timestampSuffix}.jar</artifactObjectName>
+                                <stage>api</stage>
                                 <application>${application}</application>
                             </parameters>
                             <template>src/main/aws/cloudformation.yaml</template>
@@ -107,8 +106,8 @@
                         <configuration>
                             <serverId>${server.id}</serverId>
                             <region>${region}</region>
-                            <restApiName>${application}-${mode}</restApiName>
-                            <stage>${mode}</stage>
+                            <restApiName>${application}</restApiName>
+                            <stage>api</stage>
                             <!-- optional proxy config -->
                             <httpsProxyHost>${proxy.host}</httpsProxyHost>
                             <httpsProxyPort>${proxy.port}</httpsProxyPort>
