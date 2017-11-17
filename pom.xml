@@ -12,7 +12,8 @@
         <application>myapp</application>
         <artifact.bucket>${application}-artifacts</artifact.bucket>
         <mode>dev</mode>
-        <proxy.host>proxy</proxy.host>
+        <proxy.host></proxy.host>
+        <!-- as long as proxy.host is blank this property won't be used -->
         <proxy.port>8080</proxy.port>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
