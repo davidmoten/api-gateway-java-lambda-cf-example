@@ -13,12 +13,10 @@ Example of integration of api gateway and java lambda using cloud-formation
 ./deploy.sh <MODE> -Dserver.id=<SERVERID> -Dapplication=<YOUR_APP_NAME>
 ```
 
-Note that the combination `<YOUR_APP_NAME>-<MODE>` must be unique globally because S3 buckets are unique and the deploy command creates an S3 bucket with the MODE suffix. Something like `dev1467` will be fine or you can override the application name to something unique (`-Dapplication=thebestapp34`).
-
 The call to `deploy.sh` will do the following:
 
 * build the project jar artifact
-* create a bucket for artifacts (for lambda) for the application if doesn't exist
+* create a bucket for artifacts (for lambda) for the application if doesn't exist (a unique name built from `application`, `mode` and your AWS account ID will be used)
 * deploy the built maven artifact versioned and timestamped to the artifact bucket
 * create a CloudFormation stack comprising
   * lambda 
@@ -48,6 +46,3 @@ Hello fred
 ```
 
 You can also test the api in the AWS Console at **API Gateway** - **api-gateway-java-lambda-cf-example-&lt;MODE&gt;** - **Resources** - **/do** - **GET** - **Test** 
-
-
-
