@@ -10,10 +10,10 @@ Example of integration of api gateway and java lambda using cloud-formation
 
 ### Instructions
 ```bash
-./deploy.sh <MODE> -Dserver.id=<SERVERID>
+./deploy.sh <MODE> -Dserver.id=<SERVERID> -Dapplication=<YOUR_APP_NAME>
 ```
 
-Note that ${application}-${mode} must be unique globally because S3 buckets are unique and the deploy command creates an S3 bucket with the MODE suffix. Something like `dev1467` will be fine or you can override the application name to something unique (`-Dapplication=thebestapp34`).
+Note that the combination `<YOUR_APP_NAME>-<MODE>` must be unique globally because S3 buckets are unique and the deploy command creates an S3 bucket with the MODE suffix. Something like `dev1467` will be fine or you can override the application name to something unique (`-Dapplication=thebestapp34`).
 
 The call to `deploy.sh` will do the following:
 

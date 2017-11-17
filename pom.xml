@@ -9,13 +9,13 @@
     <properties>
         <server.id>my.aws</server.id>
         <region>ap-southeast-2</region>
-        <artifact.bucket>${project.artifactId}-artifacts</artifact.bucket>
+        <application>myapp</application>
+        <artifact.bucket>${application}-artifacts</artifact.bucket>
         <mode>dev</mode>
         <proxy.host>proxy</proxy.host>
         <proxy.port>8080</proxy.port>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <application>${project.artifactId}</application>
         <timestamp>${maven.build.timestamp}</timestamp>
         <timestampSuffix>-${timestamp}</timestampSuffix>
     </properties>
@@ -43,8 +43,21 @@
             <plugin>
                 <groupId>com.github.davidmoten</groupId>
                 <artifactId>aws-maven-plugin</artifactId>
-                <version>0.2.14</version>
+                <version>0.2.15-SNAPSHOT</version>
                 <executions>
+                    <execution>
+                        <id>prop</id>
+                        <goals>
+                            <goal>property</goal>
+                        </goals>
+                        <configuration>
+                            <serverId>${server.id}</serverId>
+                            <region>${region}</region>
+                            <!-- optional proxy config -->
+                            <httpsProxyHost>${proxy.host}</httpsProxyHost>
+                            <httpsProxyPort>${proxy.port}</httpsProxyPort>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>file</id>
                         <goals>
@@ -53,7 +66,7 @@
                         <configuration>
                             <serverId>${server.id}</serverId>
                             <region>${region}</region>
-                            <bucketName>${artifact.bucket}-${mode}</bucketName>
+                            <bucketName>${artifact.bucket}-${aws.account.id}-${mode}</bucketName>
                             <create>true</create>
                             <file>${project.build.directory}/${project.artifactId}.jar</file>
                             <objectName>${project.artifactId}-${project.version}${timestampSuffix}.jar</objectName>
@@ -71,10 +84,10 @@
                         <configuration>
                             <serverId>${server.id}</serverId>
                             <region>${region}</region>
-                            <stackName>${project.artifactId}-${mode}</stackName>
+                            <stackName>${application}-${mode}</stackName>
                             <parameters>
                                 <mode>${mode}</mode>
-                                <artifactBucket>${artifact.bucket}-${mode}</artifactBucket>
+                                <artifactBucket>${artifact.bucket}-${aws.account.id}-${mode}</artifactBucket>
                                 <artifactObjectName>${project.artifactId}-${project.version}${timestampSuffix}.jar</artifactObjectName>
                                 <application>${application}</application>
                             </parameters>
