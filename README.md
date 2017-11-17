@@ -8,7 +8,7 @@ Example of integration of api gateway and java lambda using cloud-formation.
 ### Prerequisites
 * Maven installed
 * an AWS account with key and secret key access pair that has privileges to create resources
-* a `<server>` entry in `~/.m2/settings.xml` with your aws key and secret key in the username and password fields (you can encrypt these using `mvn -ep`).
+* a `<server>` entry in `~/.m2/settings.xml` with your aws key and secret key in the username and password fields (you can encrypt the password field using `mvn -ep`).
 
 ### Instructions
 ```bash
