@@ -10,13 +10,13 @@ Example of integration of api gateway and java lambda using cloud-formation
 
 ### Instructions
 ```bash
-./deploy.sh <MODE> -Dserver.id=<SERVERID> -Dapplication=<YOUR_APP_NAME>
+./deploy.sh -Dserver.id=<SERVERID> -Dapplication=<YOUR_APP_NAME>
 ```
 
 The call to `deploy.sh` will do the following:
 
 * build the project jar artifact
-* create a bucket for artifacts (for lambda) for the application if doesn't exist (a unique name built from `application`, `mode` and your AWS account ID will be used)
+* create a bucket for artifacts (for lambda) for the application if doesn't exist (a unique name built from `application` and your AWS account ID will be used)
 * deploy the built maven artifact versioned and timestamped to the artifact bucket
 * create a CloudFormation stack comprising
   * lambda 
@@ -31,18 +31,20 @@ The call to `deploy.sh` will do the following:
 
 ### How to call the api
 
-In the AWS Console go to **API Gateway** - **api-gateway-java-lambda-cf-example-&lt;MODE&gt;** - **Stages** - **&lt;MODE&gt;** - **Invoke URL** and copy the url displayed there.
+Suppose your application name was `myapp`.
 
-Also in the AWS Console go to **API Gateway** - **API Keys** - **api-gateway-java-lambda-cf-user-&lt;MODE&gt;** - **API Key** - **Show** and copy it also.
+In the AWS Console go to **API Gateway** - **myapp** - **Stages** - **api** - **Invoke URL** and copy the url displayed there.
+
+Also in the AWS Console go to **API Gateway** - **API Keys** - **myapp-user** - **API Key** - **Show** and copy it also.
 
 ```bash
 URL= ...
 X_API_KEY= ...
-curl -H "x-api-key: $X_API_KEY" "$URL/<MODE>/do?name=fred"
+curl -H "x-api-key: $X_API_KEY" "$URL/api/do?name=fred"
 ```
 prints out 
 ```
 Hello fred
 ```
 
-You can also test the api in the AWS Console at **API Gateway** - **api-gateway-java-lambda-cf-example-&lt;MODE&gt;** - **Resources** - **/do** - **GET** - **Test** 
+You can also test the api in the AWS Console at **API Gateway** - **myapp** - **Resources** - **/do** - **GET** - **Test**. Enter a value for name and click the Test button and you will see the response in the right of the frame. 
