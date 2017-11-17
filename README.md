@@ -15,6 +15,8 @@ Example of integration of api gateway and java lambda using cloud-formation.
 ./deploy.sh -Dserver.id=<SERVERID> -Dapplication=<YOUR_APP_NAME>
 ```
 
+If you are behind a proxy you can set `-Dproxy.host=<PROXY> -Dproxy.port=<PORT>` in the above command also.
+
 The call to `deploy.sh` will do the following:
 
 * build the project jar artifact
