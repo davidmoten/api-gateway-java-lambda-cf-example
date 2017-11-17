@@ -1,5 +1,7 @@
 # api-gateway-java-lambda-cf-example
-Example of integration of api gateway and java lambda using cloud-formation
+<a href="https://travis-ci.org/davidmoten/api-gateway-java-lambda-cf-example"><img src="https://travis-ci.org/davidmoten/api-gateway-java-lambda-cf.svg"/></a><br/>
+
+Example of integration of api gateway and java lambda using cloud-formation.
 
 ## How to install
 
