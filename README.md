@@ -50,3 +50,8 @@ Hello fred
 ```
 
 You can also test the api in the AWS Console at **API Gateway** - **myapp** - **Resources** - **/do** - **GET** - **Test**. Enter a value for name and click the Test button and you will see the response in the right of the frame. 
+
+## How to delete the api
+To remove the whole stack go to the AWS Console at **CloudFormation** - **Stacks** - **myapp** - **Actions** - **Delete Stack**.
+
+There is one more item you can remove that is created by `deploy.sh` and that is the artifact bucket in S3 which is called *app-<ACCOUNT_ID>-artifacts*.
