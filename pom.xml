@@ -45,7 +45,7 @@
             <plugin>
                 <groupId>com.github.davidmoten</groupId>
                 <artifactId>aws-maven-plugin</artifactId>
-                <version>0.2.16</version>
+                <version>0.2.27</version>
                 <executions>
                     <execution>
                         <id>prop</id>
@@ -68,7 +68,7 @@
                         <configuration>
                             <serverId>${server.id}</serverId>
                             <region>${region}</region>
-                            <bucketName>${artifact.bucket}-${aws.account.id}</bucketName>
+                            <bucketName>${artifact.bucket}-${aws.account.id.lowercase}</bucketName>
                             <create>true</create>
                             <file>${project.build.directory}/${project.artifactId}.jar</file>
                             <objectName>${project.artifactId}-${project.version}${timestampSuffix}.jar</objectName>
@@ -88,7 +88,7 @@
                             <region>${region}</region>
                             <stackName>${application}</stackName>
                             <parameters>
-                                <artifactBucket>${artifact.bucket}-${aws.account.id}</artifactBucket>
+                                <artifactBucket>${artifact.bucket}-${aws.account.id.lowercase}</artifactBucket>
                                 <artifactObjectName>${project.artifactId}-${project.version}${timestampSuffix}.jar</artifactObjectName>
                                 <stage>api</stage>
                                 <application>${application}</application>
