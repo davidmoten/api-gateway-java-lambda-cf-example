@@ -3,12 +3,13 @@ package com.github.davidmoten.apig.example;
 import java.util.Map;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.github.davidmoten.aws.helper.StandardRequestBodyPassThrough;
 
-public class Handler {
+public class Handler implements RequestHandler<Map<String,Object>, String> {
 
-    public String handle(Map<String, Object> input, Context context) {
-
+    @Override
+    public String handleRequest(Map<String, Object> input, Context context) {
         // expects full request body passthrough from api gateway integration
         // request
         StandardRequestBodyPassThrough request = StandardRequestBodyPassThrough.from(input);
@@ -17,6 +18,5 @@ public class Handler {
                 .orElseThrow(() -> new IllegalArgumentException("parameter 'name' not found"));
 
         return "Hello " + name;
-
     }
 }
