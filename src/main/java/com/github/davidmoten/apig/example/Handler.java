@@ -17,6 +17,6 @@ public class Handler implements RequestHandler<Map<String,Object>, String> {
         String name = request.queryStringParameter("name")
                 .orElseThrow(() -> new IllegalArgumentException("ParameterNotFound: 'name'"));
 
-        return "Hello " + name;
+        return "{\"response\": \"Hello " + name + "\"}";
     }
 }

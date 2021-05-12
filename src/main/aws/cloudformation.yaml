@@ -177,6 +177,9 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
+                    responseTemplates:
+                      ## this bit of weirdness is so quoted text doesn't get returned (json)
+                      application/json: "#set($inputRoot = $input.path('$')) \n$inputRoot"
                   ParameterNotFound.*:
                     statusCode: "400"
                 requestTemplates:
