@@ -1,7 +1,7 @@
 # api-gateway-java-lambda-cf-example
 <a href="https://travis-ci.org/davidmoten/api-gateway-java-lambda-cf-example"><img src="https://travis-ci.org/davidmoten/api-gateway-java-lambda-cf-example.svg"/></a><br/>
 
-Example of integration of api gateway and java lambda using cloud-formation.
+Example of integration of api gateway and java lambda using cloud-formation. The REST API deployed is defined using OpenAPI 3.0 and returns JSON from the single `do` method.
 
 ## How to install
 
@@ -46,9 +46,9 @@ URL= ...
 X_API_KEY= ...
 curl -H "x-api-key: $X_API_KEY" "$URL/api/do?name=fred"
 ```
-prints out 
+prints out (JSON)
 ```
-Hello fred
+"Hello fred"
 ```
 
 You can also test the api in the AWS Console at **API Gateway** - **myapp** - **Resources** - **/do** - **GET** - **Test**. Enter a value for name and click the Test button and you will see the response in the right of the frame. 
