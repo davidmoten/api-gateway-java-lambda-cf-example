@@ -177,10 +177,8 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
-                  'Parameter not found.*':
+                  ParameterNotFound.*:
                     statusCode: "400"
-                    responseParameters:
-                      method.response.header.Location: "integration.response.body.errorMessage"
                 requestTemplates:
                   application/json: "##  See http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html\n\
                     ##  This template will pass through all parameters including path, querystring,\
