@@ -165,7 +165,7 @@ Resources:
                     application/json:
                       schema: 
                         $ref: '#/components/schemas/StringResponse'
-                '500':
+                '400':
                   description: Unexpected error
                   content:
                     application/json:
@@ -177,9 +177,10 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
-                    responseTemplates:
-                      ## this bit of weirdness is so quoted text doesn't get returned (json)
-                      text/plain: "#set($inputRoot = $input.path('$')) \n$inputRoot"
+                  'Parameter not found.*':
+                    statusCode: "400"
+                    responseParameters:
+                      method.response.header.Location: "integration.response.body.errorMessage"
                 requestTemplates:
                   application/json: "##  See http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html\n\
                     ##  This template will pass through all parameters including path, querystring,\

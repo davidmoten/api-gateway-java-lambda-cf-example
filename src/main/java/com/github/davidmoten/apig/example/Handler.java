@@ -15,7 +15,7 @@ public class Handler implements RequestHandler<Map<String,Object>, String> {
         StandardRequestBodyPassThrough request = StandardRequestBodyPassThrough.from(input);
 
         String name = request.queryStringParameter("name")
-                .orElseThrow(() -> new IllegalArgumentException("parameter 'name' not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Parameter not found: 'name'"));
 
         return "Hello " + name;
     }
