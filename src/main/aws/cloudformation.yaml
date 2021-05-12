@@ -164,8 +164,15 @@ Resources:
                   content:
                     application/json:
                       schema: 
+                        # a limitation of Api Gateway is that a $ref must be used here
                         $ref: '#/components/schemas/StringResponse'
                 '400':
+                  description: Bad request
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/Error'
+                '500':
                   description: Unexpected error
                   content:
                     application/json:
@@ -180,8 +187,10 @@ Resources:
                     responseTemplates:
                       ## this bit of weirdness is so quoted text doesn't get returned (json)
                       application/json: "#set($inputRoot = $input.path('$')) \n$inputRoot"
-                  ParameterNotFound.*:
+                  BadRequest.*:
                     statusCode: "400"
+                  UnexpectedException.*:
+                    statusCode: "500"
                 requestTemplates:
                   application/json: "##  See http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html\n\
                     ##  This template will pass through all parameters including path, querystring,\
