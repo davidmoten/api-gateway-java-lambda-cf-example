@@ -21,6 +21,8 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
             // get the name query parameter
             String name = request.queryStringParameter("name")
                     .orElseThrow(() -> new IllegalArgumentException("parameter 'name' not found"));
+            
+            // for a POST, request body is in input.get("body-json")
 
             // demonstrate two paths
             // 1: s3 redirect
@@ -41,7 +43,7 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
 //                        .toString();
                 String url = "https://blah";
 
-                // must throw an exception to from java lambda to get 302
+                // must throw an exception from java lambda to get 302
                 // redirection to work! The error message (the url) is mapped by
                 // the integration response part of the API Gateway to a 302
                 // status code with Location header equal to the url value
