@@ -22,7 +22,7 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
             // demonstrate two paths
             // 1 is s3 redirect
             // 2 is return json
-            
+
             if ("redirect".equals(name)) {
                 // return the s3 url of a file, return bucket should have expiry set to say 4
                 // hours so we have enough time to debug stuff if required
@@ -43,20 +43,18 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
                 // status code with Location header equal to the url value
                 throw new RedirectException(url);
             } else {
-                String json = "{\"response\": \"Hello " + name + "\"}";
                 // as we are returning JSON we specify a don't-touch-it response template in the
                 // cloudformation script so that it doesn't get serialized again into json
                 // (quoted).
-                return json;
+                return "{\"response\": \"Hello " + name + "\"}";
             }
         } catch (IllegalArgumentException e) {
-            // lambda infrastructure will ensure that thrown exception gets returned as a
-            // json payload {errorMessage, errorType, stackTrace, cause}
+            // lambda infrastructure will ensure that any thrown exception gets returned as
+            // a json payload {errorMessage, errorType, stackTrace, cause}
 
             // cloudformation.yaml defines pattern to match the errorMessage field to a 400
             // status code. Wrapping with BadRequestException will prefix the errorMessage
-            // with
-            // 'BadRequest' which is matched in cloudformation pattern.
+            // with 'BadRequest' which is matched in cloudformation pattern.
             throw new BadRequestException(e);
         } catch (RedirectException e) {
             // rethrow
