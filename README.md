@@ -10,6 +10,9 @@ This project has been updated to use
 * an S3 redirect example
 * full json api
 
+## About this project
+This project is all about the [cloudformation.yaml](https://github.com/davidmoten/api-gateway-java-lambda-cf-example/blob/master/src/main/aws/cloudformation.yaml) script and the lambda [handler](https://github.com/davidmoten/api-gateway-java-lambda-cf-example/blob/master/src/main/java/com/github/davidmoten/apig/example/Handler.java). Have a look at those files which have been generously commented to understand more of how the api gateway to java lambda integration happens.
+
 ## How to install
 You can deploy this application to your own AWS account by following the steps below. It's not a bad idea just to check that stuff is working. Then you can copy the project, refactor package names, artifact and groupId names and customize to your liking.
 
