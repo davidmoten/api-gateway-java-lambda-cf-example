@@ -3,14 +3,15 @@
 
 Example of integration of api gateway and java lambda using cloud-formation. The REST API deployed is defined using OpenAPI 3.0 and returns JSON from the single `do` method.
 
-**Update May 2021**
+## Update May 2021**
 This project has been updated to use 
-* OpenAPI 3.0
+* OpenAPI 3.0 with 200, 302, 400, 500 responses
 * properly mapped errors
 * an S3 redirect example
 * full json api
 
 ## How to install
+You can deploy this application to your own AWS account by following the steps below. It's not a bad idea just to check that stuff is working. Then you can copy the project, refactor package names, artifact and groupId names and customize to your liking.
 
 ### Prerequisites
 * Maven installed
