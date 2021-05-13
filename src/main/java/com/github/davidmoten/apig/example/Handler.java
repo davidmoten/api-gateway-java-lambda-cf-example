@@ -13,15 +13,18 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
 
     @Override
     public String handleRequest(Map<String, Object> input, Context context) {
+        // be sure to wrap all server side code in a try-catch and catch ALL throwables
         try {
             // expects full request body passthrough from api gateway integration request
             StandardRequestBodyPassThrough request = StandardRequestBodyPassThrough.from(input);
+            
+            // get the name query parameter
             String name = request.queryStringParameter("name")
                     .orElseThrow(() -> new IllegalArgumentException("parameter 'name' not found"));
 
             // demonstrate two paths
-            // 1 is s3 redirect
-            // 2 is return json
+            // 1: s3 redirect
+            // 2: return json
 
             if ("redirect".equals(name)) {
                 // return the s3 url of a file, return bucket should have expiry set to say 4
@@ -30,6 +33,7 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
 //                String replyObjectName = "replayObject";
 //                
 //                // use AWS SDK S3 object to generate presigned url
+//                AmazonS3Client s3 = new AmazonS3Client();                
 //                String url = s3.generatePresignedUrl( //
 //                        replyBucketName, //
 //                        replyObjectName, //
@@ -48,9 +52,12 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
                 // (quoted).
                 return "{\"response\": \"Hello " + name + "\"}";
             }
-        } catch (IllegalArgumentException e) {
-            // lambda infrastructure will ensure that any thrown exception gets returned as
-            // a json payload {errorMessage, errorType, stackTrace, cause}
+        }
+        // lambda infrastructure will ensure that any thrown exception gets returned as
+        // a json payload {errorMessage, errorType, stackTrace, cause}
+        catch (IllegalArgumentException e) {
+            // Any exception that represents a bad request should be wrapped in a
+            // BadRequestException and rethrown.
 
             // cloudformation.yaml defines pattern to match the errorMessage field to a 400
             // status code. Wrapping with BadRequestException will prefix the errorMessage
@@ -60,6 +67,10 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
             // rethrow
             throw e;
         } catch (Throwable e) {
+            // Note that it is advised to catch Throwable because any uncaught errors will
+            // get mapped to a 200 response (assuming that their message doesn't by chance
+            // pattern match any of the other response codes).
+
             /// cloudformation.yaml defines pattern to match the errorMessage field to a 500
             // status code. Wrapping with ServerException will prefix the errorMessage with
             // 'ServerException' which is matched in cloudformation pattern.
