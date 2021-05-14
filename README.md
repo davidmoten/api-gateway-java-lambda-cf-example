@@ -68,3 +68,6 @@ You can also test the api in the AWS Console at **API Gateway** - **myapp** - **
 To remove the whole stack go to the AWS Console at **CloudFormation** - **Stacks** - **myapp** - **Actions** - **Delete Stack**.
 
 There is one more item you can remove that is created by `deploy.sh` and that is the artifact bucket in S3 which is called *app-<ACCOUNT_ID>-artifacts*.
+
+## Hints for developing
+* a big hint to speed your development is work on the cloudformation stuff first (paths, parameters, integrations) then do the work in the java handler. The reason for this is that as you add dependencies for the handler (java libraries) the jar deployed to lambda will grow and your test cycle will become longer because of the delays in uploading the jar to AWS.
