@@ -3,11 +3,12 @@
 
 Example of integration of api gateway and java lambda using cloud-formation. The REST API deployed is defined using OpenAPI 3.0 and returns JSON from the single `do` method.
 
-## Update May 2021**
+## Update July 2021**
 This project has been updated to use 
 * OpenAPI 3.0 with 200, 302, 400, 500 responses
 * properly mapped errors
 * an S3 redirect example
+* a binary response example (see the '/image` path in [cloudformation.yaml](src/main/aws/cloudformation.yaml])
 * full json api
 
 ## About this project
