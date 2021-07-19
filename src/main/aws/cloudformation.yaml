@@ -74,7 +74,7 @@ Resources:
       FunctionName: !Ref LambdaFunction
       Principal: apigateway.amazonaws.com
       ## * below allows the Aws Console API Gateway Test to work. 
-      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/GET/${path}"
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/GET/*"
       
   ## create the deployment of a stage (so that the stage is published to an https url)
   ApiDeployment:
@@ -148,7 +148,90 @@ Resources:
         info:
           version: 2021-05-13T09:31:00Z
           title: "${application}"
+        x-amazon-apigateway-binary-media-types: ["application/octet-stream","image/png"]
         paths:
+          /image:
+            get:
+              responses:
+                '200':  
+                  description: ok response
+                  headers:
+                    Content-Type:
+                      schema:
+                        type: string
+                  content: 
+                    'image/png': 
+                      schema:
+                        $ref: "#/components/schemas/Empty"
+                '302':
+                  description: Redirect to s3 object
+                  headers:
+                    Location:
+                      schema:
+                        type: string
+                  content:
+                    application/json:
+                      schema:
+                        $ref: "#/components/schemas/Empty"
+                '400':
+                  description: Bad request
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/Error'
+                '500':
+                  description: Unexpected error
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/Error'   
+              x-amazon-apigateway-integration:
+                responses:
+                  https.*: # match url
+                    statusCode: 302
+                    responseParameters:
+                      method.response.header.Location: "integration.response.body.errorMessage"
+                  BadRequest.*:
+                    statusCode: 400
+                  ServerException.*:
+                    statusCode: 500
+                  default:
+                    statusCode: 200
+                    contentHandling: CONVERT_TO_BINARY
+                    responseParameters:
+                      method.response.header.Content-Type: "'image/png'"
+                requestTemplates:
+                  application/json: "##  See http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-mapping-template-reference.html\n\
+                    ##  This template will pass through all parameters including path, querystring,\
+                    \ header, stage variables, and context through to the integration endpoint\
+                    \ via the body/payload\n#set($allParams = $input.params())\n{\n\"body-json\"\
+                    \ : $input.json('$'),\n\"params\" : {\n#foreach($type in $allParams.keySet())\n\
+                    \    #set($params = $allParams.get($type))\n\"$type\" : {\n    #foreach($paramName\
+                    \ in $params.keySet())\n    \"$paramName\" : \"$util.escapeJavaScript($params.get($paramName))\"\
+                    \n        #if($foreach.hasNext),#end\n    #end\n}\n    #if($foreach.hasNext),#end\n\
+                    #end\n},\n\"stage-variables\" : {\n#foreach($key in $stageVariables.keySet())\n\
+                    \"$key\" : \"$util.escapeJavaScript($stageVariables.get($key))\"\n   \
+                    \ #if($foreach.hasNext),#end\n#end\n},\n\"context\" : {\n    \"account-id\"\
+                    \ : \"$context.identity.accountId\",\n    \"api-id\" : \"$context.apiId\"\
+                    ,\n    \"api-key\" : \"$context.identity.apiKey\",\n    \"authorizer-principal-id\"\
+                    \ : \"$context.authorizer.principalId\",\n    \"caller\" : \"$context.identity.caller\"\
+                    ,\n    \"cognito-authentication-provider\" : \"$context.identity.cognitoAuthenticationProvider\"\
+                    ,\n    \"cognito-authentication-type\" : \"$context.identity.cognitoAuthenticationType\"\
+                    ,\n    \"cognito-identity-id\" : \"$context.identity.cognitoIdentityId\"\
+                    ,\n    \"cognito-identity-pool-id\" : \"$context.identity.cognitoIdentityPoolId\"\
+                    ,\n    \"http-method\" : \"$context.httpMethod\",\n    \"stage\" : \"\
+                    $context.stage\",\n    \"source-ip\" : \"$context.identity.sourceIp\"\
+                    ,\n    \"user\" : \"$context.identity.user\",\n    \"user-agent\" : \"\
+                    $context.identity.userAgent\",\n    \"user-arn\" : \"$context.identity.userArn\"\
+                    ,\n    \"request-id\" : \"$context.requestId\",\n    \"resource-id\" :\
+                    \ \"$context.resourceId\",\n    \"resource-path\" : \"$context.resourcePath\"\
+                    \n    }\n}\n"
+                # escape the substitution using ! before stageVariables.function
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${application}/invocations"
+                #passthroughBehavior: when_no_match
+                httpMethod: POST
+                #contentHandling: CONVERT_TO_BINARY # for request only
+                type: aws          
           /do:
             get:
               parameters:
@@ -188,8 +271,6 @@ Resources:
                     application/json:
                       schema:
                         $ref: '#/components/schemas/Error'   
-              security:
-                - api_key: []
               x-amazon-apigateway-integration:
                 responses:
                   https.*: # match url
@@ -264,5 +345,5 @@ Resources:
                 in: header       # can be "header", "query" or "cookie"
                 name: x-api-key  # name of the header, query parameter or cookie
           # 2) Apply the API key globally to all operations
-        security:
-          - ApiKeyAuth: []     # use the same name as under securitySchemesssss
+        security: []
+          # - ApiKeyAuth: []     # use the same name as under securitySchemesssss

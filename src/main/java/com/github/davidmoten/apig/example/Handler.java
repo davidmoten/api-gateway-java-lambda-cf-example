@@ -1,5 +1,8 @@
 package com.github.davidmoten.apig.example;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.Map;
 
 import com.amazonaws.services.lambda.runtime.Context;
@@ -17,6 +20,19 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
         try {
             // expects full request body passthrough from api gateway integration request
             StandardRequestBodyPassThrough request = StandardRequestBodyPassThrough.from(input);
+
+            // binary response
+            if ("/image".equals(request.resourcePath().orElse(""))) {
+                byte[] buffer = new byte[8192];
+                ByteArrayOutputStream b = new ByteArrayOutputStream();
+                try (InputStream in = Handler.class.getResourceAsStream("/tiny.png")) {
+                    int n;
+                    while ((n = in.read(buffer)) != -1) {
+                        b.write(buffer, 0, n);
+                    }
+                }
+                return Base64.getEncoder().encodeToString(b.toByteArray());
+            }
 
             // get the name query parameter
             String name = request.queryStringParameter("name")
