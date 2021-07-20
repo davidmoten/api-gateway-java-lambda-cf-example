@@ -31,7 +31,10 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
 			}
 
 			// binary response with customized content-type
-			if ("/wms".equals(request.resourcePath().orElse(""))) {
+			// note that using a LAMBDA_PROXY integration the request variables are
+			// different so we look at
+			// "path"
+			if ("/wms".equals(input.get("path"))) {
 				return createWmsJsonResponse();
 			}
 
@@ -100,8 +103,12 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
 		try (InputStream in = Handler.class.getResourceAsStream("/tiny.png")) {
 			byte[] b = readBytes(in);
 			String b64 = Base64.getEncoder().encodeToString(b);
-			return "{\"isBase64Encoded\":true,\n\"statusCode\":\"200\",\n\"body\":\"" + b64
-					+ "\",\n\"headers\": {\"Content-Type\":\"image/png\"}}";
+			return "{" //
+					+ "\"isBase64Encoded\":true,\n" //
+					+ "\"statusCode\": 200,\n" //
+					+ "\"headers\": {\"Content-Type\":\"image/png\"},\n" //
+					+ "\"body\":\"" + b64 + "\"" //
+					+ "}";
 		}
 	}
 
@@ -114,7 +121,7 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
 		}
 		return b.toByteArray();
 	}
-	
+
 	public static void main(String[] args) throws IOException {
 		System.out.println(createWmsJsonResponse());
 	}
