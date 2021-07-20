@@ -285,7 +285,7 @@ Resources:
                     statusCode: 500
                   default:
                     statusCode: 200
-                    #contentHandling: CONVERT_TO_BINARY
+                    contentHandling: CONVERT_TO_BINARY
                     #responseParameters:
                     #  method.response.header.Content-Type: "'image/png'"
                 requestTemplates:
@@ -319,7 +319,7 @@ Resources:
                 #passthroughBehavior: when_no_match
                 httpMethod: POST
                 #contentHandling: CONVERT_TO_BINARY # for request only
-                type: aws                               
+                type: AWS_PROXY                              
           /do:
             get:
               parameters:

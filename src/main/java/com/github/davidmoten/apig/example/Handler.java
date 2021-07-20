@@ -32,12 +32,7 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
 
 			// binary response with customized content-type
 			if ("/wms".equals(request.resourcePath().orElse(""))) {
-				try (InputStream in = Handler.class.getResourceAsStream("/tiny.png")) {
-					byte[] b = readBytes(in);
-					String b64 = Base64.getEncoder().encodeToString(b);
-					return "{\"isBase64Encoded\":true,\n\"statusCode\":200,\n\"body\":\"" + b64
-							+ "\",\n\"headers\": {\"Content-Type\":\"image/png\"}}";
-				}
+				return createWmsJsonResponse();
 			}
 
 			// get the name query parameter
@@ -101,6 +96,15 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
 		}
 	}
 
+	private static String createWmsJsonResponse() throws IOException {
+		try (InputStream in = Handler.class.getResourceAsStream("/tiny.png")) {
+			byte[] b = readBytes(in);
+			String b64 = Base64.getEncoder().encodeToString(b);
+			return "{\"isBase64Encoded\":true,\n\"statusCode\":\"200\",\n\"body\":\"" + b64
+					+ "\",\n\"headers\": {\"Content-Type\":\"image/png\"}}";
+		}
+	}
+
 	private static byte[] readBytes(InputStream in) throws IOException {
 		byte[] buffer = new byte[8192];
 		ByteArrayOutputStream b = new ByteArrayOutputStream();
@@ -109,5 +113,9 @@ public class Handler implements RequestHandler<Map<String, Object>, String> {
 			b.write(buffer, 0, n);
 		}
 		return b.toByteArray();
+	}
+	
+	public static void main(String[] args) throws IOException {
+		System.out.println(createWmsJsonResponse());
 	}
 }
