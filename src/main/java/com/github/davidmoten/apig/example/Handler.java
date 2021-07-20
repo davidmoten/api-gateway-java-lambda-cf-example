@@ -67,7 +67,7 @@ public class Handler implements RequestHandler<Map<String, Object>, APIGatewayPr
     }
 
     private static APIGatewayProxyResponseEvent createWmsJsonResponse() throws IOException {
-        try (InputStream in = Handler.class.getResourceAsStream("/tiny.png")) {
+        try (InputStream in = Handler.class.getResourceAsStream("/me-cartoon.png")) {
             byte[] b = readBytes(in);
             String b64 = Base64.getEncoder().encodeToString(b);
             Map<String, String> headers = new HashMap<>();
