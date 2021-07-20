@@ -4,125 +4,92 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.github.davidmoten.aws.helper.BadRequestException;
 import com.github.davidmoten.aws.helper.RedirectException;
-import com.github.davidmoten.aws.helper.ServerException;
-import com.github.davidmoten.aws.helper.StandardRequestBodyPassThrough;
 
-public class Handler implements RequestHandler<Map<String, Object>, String> {
+public class Handler implements RequestHandler<Map<String, Object>, APIGatewayProxyResponseEvent> {
 
-	@Override
-	public String handleRequest(Map<String, Object> input, Context context) {
-		// be sure to wrap all server side code in a try-catch and catch ALL throwables
-		try {
-			// expects full request body passthrough from api gateway integration request
-			StandardRequestBodyPassThrough request = StandardRequestBodyPassThrough.from(input);
+    @Override
+    public APIGatewayProxyResponseEvent handleRequest(Map<String, Object> input, Context context) {
+        // be sure to wrap all server side code in a try-catch and catch ALL throwables
+        try {
 
-			// binary response
-			if ("/image".equals(request.resourcePath().orElse(""))) {
-				try (InputStream in = Handler.class.getResourceAsStream("/tiny.png")) {
-					byte[] b = readBytes(in);
-					return Base64.getEncoder().encodeToString(b);
-				}
-			}
+            // binary response with customized content-type
+            // note that using a LAMBDA_PROXY integration the request variables are
+            // different so we look at
+            // "path"
+            if ("/wms".equals(input.get("path"))) {
+                return createWmsJsonResponse();
+            } else {
+                throw new BadRequestException("unknown path");
+            }
+        }
+        // lambda infrastructure will ensure that any thrown exception gets returned as
+        // a json payload {errorMessage, errorType, stackTrace, cause}
+        catch (BadRequestException | IllegalArgumentException e) {
+            return new APIGatewayProxyResponseEvent() //
+                    .withStatusCode(400) //
+                    .withBody(e.getMessage()) //
+                    .withHeaders(header("Content-Type", "application/json").build());
+        } catch (RedirectException e) {
+            return new APIGatewayProxyResponseEvent() //
+                    .withStatusCode(302) //
+                    .withHeaders(header("Location", e.getMessage()).build());
+        } catch (Throwable e) {
+            return new APIGatewayProxyResponseEvent() //
+                    .withStatusCode(500) //
+                    .withBody(e.getMessage()) //
+                    .withHeaders(header("Content-Type", "application/json").build());
+        }
+    }
 
-			// binary response with customized content-type
-			// note that using a LAMBDA_PROXY integration the request variables are
-			// different so we look at
-			// "path"
-			if ("/wms".equals(input.get("path"))) {
-				return createWmsJsonResponse();
-			}
+    private static Builder header(String name, String value) {
+        return new Builder().header(name, value);
+    }
 
-			// get the name query parameter
-			String name = request.queryStringParameter("name")
-					.orElseThrow(() -> new IllegalArgumentException("parameter 'name' not found"));
+    static final class Builder {
+        private Map<String, String> headers = new HashMap<>();
 
-			// for a POST, request body is in input.get("body-json")
+        Builder header(String name, String value) {
+            headers.put(name, value);
+            return this;
+        }
 
-			// demonstrate two paths
-			// 1: s3 redirect
-			// 2: return json
+        Map<String, String> build() {
+            return headers;
+        }
+    }
 
-			if ("redirect".equals(name)) {
-				// return the s3 url of a file, return bucket should have expiry set to say 4
-				// hours so we have enough time to debug stuff if required
-//                String replyBucketName = "replyBucket";
-//                String replyObjectName = "replayObject";
-//                
-//                // use AWS SDK S3 object to generate presigned url
-//                AmazonS3Client s3 = new AmazonS3Client();                
-//                String url = s3.generatePresignedUrl( //
-//                        replyBucketName, //
-//                        replyObjectName, //
-//                        new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(4))) //
-//                        .toString();
-				String url = "https://blah";
+    private static APIGatewayProxyResponseEvent createWmsJsonResponse() throws IOException {
+        try (InputStream in = Handler.class.getResourceAsStream("/tiny.png")) {
+            byte[] b = readBytes(in);
+            String b64 = Base64.getEncoder().encodeToString(b);
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Content-Type", "image/png");
+            return new APIGatewayProxyResponseEvent().withStatusCode(200)//
+                    .withHeaders(headers) //
+                    .withIsBase64Encoded(true) //
+                    .withBody(b64);
+        }
+    }
 
-				// must throw an exception from java lambda to get 302
-				// redirection to work! The error message (the url) is mapped by
-				// the integration response part of the API Gateway to a 302
-				// status code with Location header equal to the url value
-				throw new RedirectException(url);
-			} else {
-				// as we are returning JSON we specify a don't-touch-it response template in the
-				// cloudformation script so that it doesn't get serialized again into json
-				// (quoted).
-				return "{\"response\": \"Hello " + name + "\"}";
-			}
-		}
-		// lambda infrastructure will ensure that any thrown exception gets returned as
-		// a json payload {errorMessage, errorType, stackTrace, cause}
-		catch (BadRequestException | ServerException | RedirectException e) {
-			throw e;
-		} catch (IllegalArgumentException e) {
-			// Any exception that represents a bad request should be wrapped in a
-			// BadRequestException and rethrown.
+    private static byte[] readBytes(InputStream in) throws IOException {
+        byte[] buffer = new byte[8192];
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+        int n;
+        while ((n = in.read(buffer)) != -1) {
+            b.write(buffer, 0, n);
+        }
+        return b.toByteArray();
+    }
 
-			// cloudformation.yaml defines pattern to match the errorMessage field to a 400
-			// status code. Wrapping with BadRequestException will prefix the errorMessage
-			// with 'BadRequest' which is matched in cloudformation pattern.
-			throw new BadRequestException(e);
-		} catch (Throwable e) {
-			// Note that it is advised to catch Throwable because any uncaught errors will
-			// get mapped to a 200 response (assuming that their message doesn't by chance
-			// pattern match any of the other response codes).
-
-			/// cloudformation.yaml defines pattern to match the errorMessage field to a 500
-			// status code. Wrapping with ServerException will prefix the errorMessage with
-			// 'ServerException' which is matched in cloudformation pattern.
-			throw new ServerException(e);
-		}
-	}
-
-	private static String createWmsJsonResponse() throws IOException {
-		try (InputStream in = Handler.class.getResourceAsStream("/tiny.png")) {
-			byte[] b = readBytes(in);
-			String b64 = Base64.getEncoder().encodeToString(b);
-			return "{" //
-					+ "\"isBase64Encoded\":true,\n" //
-					+ "\"statusCode\": 200,\n" //
-					+ "\"headers\": {\"Content-Type\":\"image/png\"},\n" //
-					+ "\"body\":\"" + b64 + "\"" //
-					+ "}";
-		}
-	}
-
-	private static byte[] readBytes(InputStream in) throws IOException {
-		byte[] buffer = new byte[8192];
-		ByteArrayOutputStream b = new ByteArrayOutputStream();
-		int n;
-		while ((n = in.read(buffer)) != -1) {
-			b.write(buffer, 0, n);
-		}
-		return b.toByteArray();
-	}
-
-	public static void main(String[] args) throws IOException {
-		System.out.println(createWmsJsonResponse());
-	}
+    public static void main(String[] args) throws IOException {
+        System.out.println(createWmsJsonResponse());
+    }
 }
