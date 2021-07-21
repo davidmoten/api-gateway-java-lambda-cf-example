@@ -143,15 +143,15 @@ Resources:
       Name: !Sub "${application}"
       Description: !Sub "${application} rest api"
       FailOnWarnings: true
+      # if you dont' put a wildcard here then Accept request header required to make b64 decode happen
       BinaryMediaTypes: ["*~1*"]
       Body:
         openapi: 3.0.0
         info:
           version: 2021-05-13T09:31:00Z
           title: "${application}"
-        #x-amazon-apigateway-binary-media-types: ["image/png"]
-        paths:
           
+        paths:
           /wms:
             get:
               x-amazon-apigateway-integration:
