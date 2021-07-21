@@ -143,12 +143,13 @@ Resources:
       Name: !Sub "${application}"
       Description: !Sub "${application} rest api"
       FailOnWarnings: true
+      BinaryMediaTypes: ["*~1*"]
       Body:
         openapi: 3.0.0
         info:
           version: 2021-05-13T09:31:00Z
           title: "${application}"
-        x-amazon-apigateway-binary-media-types: ["application/octet-stream","image/png","image/jpeg","application/xml"]
+        #x-amazon-apigateway-binary-media-types: ["image/png"]
         paths:
           
           /wms:
@@ -159,7 +160,7 @@ Resources:
                 uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${application}/invocations"
               responses:
                 "200":
-                  description: ""
+                  description: "wms tile image"
 
         components:
           schemas:

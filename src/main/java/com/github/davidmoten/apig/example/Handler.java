@@ -75,7 +75,9 @@ public class Handler implements RequestHandler<Map<String, Object>, APIGatewayPr
             return new APIGatewayProxyResponseEvent().withStatusCode(200)//
                     .withHeaders(headers) //
                     .withIsBase64Encoded(true) //
-                    .withBody(b64);
+//                    .withBody("aGkgdGhlcmU=") //
+                    .withBody(b64) //
+            ;
         }
     }
 
